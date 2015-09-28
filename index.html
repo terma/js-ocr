@@ -3,49 +3,61 @@
 <head>
     <script type="text/javascript" src="angular.js"></script>
     <script type="text/javascript" src="network.js"></script>
-    <script type="text/javascript" src="engine.js"></script>
+    <script type="text/javascript" src="character.js"></script>
+
+    <style type="text/css">
+
+        body {
+            margin: 3%;
+            font-family: monospace;
+        }
+
+    </style>
 </head>
 <body>
 
-<div style="width: 33%; float: left;">
-    Input
-    <a href="javascript:void(0);" ng-click="decide()">Decide</a>,
-    <input type="text" ng-model="expectedOutputIndex">
-    <a href="javascript:void(0);" ng-click="study()">Study</a>
-    <table style="font-size: 10px;">
-        <tr ng-repeat="row in input track by $index" ng-init="rowIndex = $index">
-            <td ng-repeat="item in row track by $index">
-                <a href="javascript:void(0);" ng-click="mutateInput($index, rowIndex)">{{ item }}</a>
-            </td>
-        </tr>
-    </table>
+<h1>Network</h1>
 
-    <canvas width="{{ size }}" height="{{ size }}" id="canvas"></canvas>
-    <input type="button" ng-click="startStudy()" value="Start Study">
-    <input type="button" ng-click="stopStudy()" value="Stop Study">
-</div>
+<h3>Input</h3>
 
-<div style="width: 33%; float: left;">
-    Network
-    <input type="text" ng-model="outputCounts">
-    <table>
-        <tr ng-repeat="neuron in network.neurons">
-            <td>Neuron{{ $index }}</td>
-            <td ng-repeat="inputWeight in neuron.inputWeights track by $index">
-                {{ inputWeight | number : 1 }}
-            </td>
-        </tr>
-    </table>
-</div>
+<p>
+    English Alphabet
+</p>
 
-<div style="width: 33%; float: left;">
-    Output
-    <table>
-        <tr ng-repeat="item in output track by $index">
-            <td>{{ item }}</td>
-        </tr>
-    </table>
+<table border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td style="padding-right: 10px; padding-bottom: 10px;"><label>Character pic side</label></td>
+        <td style="padding-bottom: 10px;"><input type="text" ng-model="pictureSide"></td>
+    </tr>
+    <tr>
+        <td style="padding-right: 10px;"><label>Accepted Accuracy</label></td>
+        <td><input type="text" ng-model="acceptedAccuracy"></td>
+    </tr>
+</table>
+
+<h3>State</h3>
+
+<p>
+    Study Time {{ studyTime }} msec<br>Study Cycles {{ studyCycle }}<br>Accuracy {{ accuracy }}
+
+<p>Latest Test Result ({{ result.success }} / {{ result.tests.length }})</p>
+
+<p>
+
+<div ng-repeat="item in result.tests" style="padding: 2px; padding-right: 4px; display: inline-block;">{{ item.test }}=>{{
+    item.recognized }}
 </div>
+</p>
+
+<p>
+    <input type="button" ng-click="init()" value="Reset">
+    <input type="button" ng-click="startStudy()" ng-show="!studyTimeout" value="Start Study">
+    <input type="button" ng-click="stopStudy()" ng-show="studyTimeout" value="Stop Study">
+</p>
+
+<p>
+    <input type="button" ng-click="download()" value="Download Configuration">
+</p>
 
 </body>
 </html>
