@@ -1,4 +1,4 @@
-function OneLayerKohenNetwork(inputCount, outputCount) {
+function OneLayerSelfOrganizingKohonenNetwork(inputCount, outputCount) {
     this.neurons = [];
     this.inputCount = inputCount;
     this.outputCount = outputCount;
@@ -15,7 +15,7 @@ function OneLayerKohenNetwork(inputCount, outputCount) {
     }
 }
 
-OneLayerKohenNetwork.prototype.study = function (input, outputIndex) {
+OneLayerSelfOrganizingKohonenNetwork.prototype.study = function (input, outputIndex) {
     var neuron = this.neurons[outputIndex];
     for (var i = 0; i < neuron.inputWeights.length; i++) {
         var originalWeight = neuron.inputWeights[i];
@@ -23,7 +23,7 @@ OneLayerKohenNetwork.prototype.study = function (input, outputIndex) {
     }
 };
 
-OneLayerKohenNetwork.prototype.decide = function (input) {
+OneLayerSelfOrganizingKohonenNetwork.prototype.decide = function (input) {
     if (this.inputCount !== input.length) throw Error('Invalid input!');
 
     var neuronOutputs = [];

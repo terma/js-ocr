@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html ng-app="App" ng-controller="controller">
+<head>
+    <script type="text/javascript" src="angular.js"></script>
+    <script type="text/javascript" src="one-layer-self-organizing-kohonen-network.js"></script>
+    <script type="text/javascript" src="character.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Pure JS character OCR based on Self-organizing One Level Kohonen Network</h1>
+
+<p>
+    <a href="index.html">Main</a>
+    <a href="https://github.com/terma/js-ocr/blob/master/one-layer-self-organizing-kohonen-network.js">GitHub Code</a>
+    <a href="http://gorbachenko.self-organization.ru/articles/Self-organizing_map.pdf">Description (RU)</a>
+</p>
+
+<h3>Input</h3>
+
+<p>
+    English Alphabet
+</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td style="padding-right: 10px; padding-bottom: 10px;"><label>Character pic side</label></td>
+        <td style="padding-bottom: 10px;"><input type="text" ng-model="pictureSide"></td>
+    </tr>
+    <tr>
+        <td style="padding-right: 10px; padding-bottom: 10px;"
+        "><label>Accepted Accuracy</label></td>
+        <td style="padding-bottom: 10px;"><input type="text" ng-model="acceptedAccuracy"></td>
+    </tr>
+    <tr>
+        <td style="padding-right: 10px; padding-bottom: 10px;"><label>Study Max Rotation (Degree) -/+</label></td>
+        <td style="padding-bottom: 10px;"><input type="text" ng-model="studyMaxRotation"></td>
+    </tr>
+    <tr>
+        <td style="padding-right: 10px;"><label>Test Max Rotation (Degree) -/+</label></td>
+        <td><input type="text" ng-model="testMaxRotation"></td>
+    </tr>
+</table>
+
+<h3>Study</h3>
+
+<input type="button" ng-click="init()" value="Reset">
+<input type="button" ng-click="startStudy()" ng-show="!studyTimeout" value="Study">
+<input type="button" ng-click="stopStudy()" ng-show="studyTimeout" value="Stop Study">
+
+<input type="button" ng-click="download()" value="Download Configuration">
+
+<h3>Study Cases</h3>
+
+<img ng-repeat="case in studyCases" style="width: 20px; height: 20px;" ng-attr-src="{{ case.url }}"/>
+
+<h3>Test Result</h3>
+
+Study Time {{ studyTime }} msec<br>Study Cycles {{ studyCycle }}<br>Accuracy {{ accuracy }}<p>
+
+<div ng-repeat="result in testResults" style="display: inline-block;" class="result"
+     ng-class="{'error': !result.success}">
+    <img style="width: 20px; height: 20px;" ng-attr-src="{{ result.url }}"/>
+    <span>{{ result.recognized }}</span>
+</div>
+
+</body>
+</html>
+

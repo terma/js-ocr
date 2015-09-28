@@ -18,7 +18,7 @@ App.controller('controller', ['$scope', '$interval', function ($scope, $interval
 
 
     $scope.$watch('outputCounts', function (newValue) {
-        $scope.network = new OneLayerKohenNetwork($scope.size * $scope.size, newValue);
+        $scope.network = new OneLayerSelfOrganizingKohonenNetwork($scope.size * $scope.size, newValue);
     });
 
     $scope.mutateInput = function (x, y) {

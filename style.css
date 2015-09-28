@@ -1,0 +1,14 @@
+body {
+    margin: 3%;
+    font-family: monospace;
+}
+
+.result {
+    border: 1px solid transparent;
+    border-collapse: collapse;
+}
+
+.error {
+    border: 1px solid red;
+    border-collapse: collapse;
+}

@@ -4,7 +4,9 @@ App.controller('controller', ['$scope', '$timeout', function ($scope, $timeout) 
 
     $scope.characters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     $scope.pictureSide = 20;
-    $scope.acceptedAccuracy = 0.8;
+    $scope.acceptedAccuracy = 0.7;
+    $scope.studyMaxRotation = 0;
+    $scope.testMaxRotation = 5;
 
     $scope.$watch('pictureSide', function () {
         $scope.init();
@@ -28,9 +30,10 @@ App.controller('controller', ['$scope', '$timeout', function ($scope, $timeout) 
 
     $scope.init = function () {
         $scope.stopStudy();
-        $scope.network = new OneLayerKohenNetwork($scope.pictureSide * $scope.pictureSide, $scope.characters.length);
+        $scope.network = new OneLayerSelfOrganizingKohonenNetwork($scope.pictureSide * $scope.pictureSide, $scope.characters.length);
         $scope.studyCycle = 0;
         $scope.accuracy = -1;
+        $scope.testResults = [];
     };
 
     $scope.download = function () {
@@ -38,29 +41,73 @@ App.controller('controller', ['$scope', '$timeout', function ($scope, $timeout) 
     };
 
     $scope.startStudy = function () {
-        if ($scope.studyInterval) return;
+        if ($scope.studyTimeout) return;
 
-        $scope.studyStartTime = Date.now();
+        $scope.studyCycle = 0;
 
-        function studyCycle() {
+        // init test data
+        function createTestCases() {
+            $scope.testResults = [];
             var canvas = angular.element('<canvas width="' + $scope.pictureSide + '" height="' + $scope.pictureSide + '" style="visibility: hidden;"></canvas>')[0];
             angular.element(document.body).append(canvas);
 
-            // one cycle
             for (var c = 0; c < $scope.characters.length; c++) {
-                var characterImage = drawCharacter(canvas, $scope.characters[c]);
-                var input = imageToInput(characterImage);
-                $scope.network.study(input, c);
+                if ($scope.testMaxRotation != 0) {
+                    for (var r = -$scope.testMaxRotation; r < $scope.testMaxRotation; r++) {
+                        var studyCase = drawCharacter(canvas, $scope.characters[c], r);
+                        studyCase.character = $scope.characters[c];
+                        studyCase.success = 0;
+                        studyCase.count = 0;
+                        $scope.testResults.push(studyCase);
+                    }
+                } else {
+                    var studyCase = drawCharacter(canvas, $scope.characters[c], 0);
+                    studyCase.character = $scope.characters[c];
+                    studyCase.success = 0;
+                    studyCase.count = 0;
+                    $scope.testResults.push(studyCase);
+                }
+            }
+        }
+
+        createTestCases();
+
+        // init study data
+        $scope.studyCases = [];
+        var canvas = angular.element('<canvas width="' + $scope.pictureSide + '" height="' + $scope.pictureSide + '" style="visibility: hidden;"></canvas>')[0];
+        angular.element(document.body).append(canvas);
+
+        for (var c = 0; c < $scope.characters.length; c++) {
+            if ($scope.studyMaxRotation != 0) {
+                for (var r = -$scope.studyMaxRotation; r < $scope.studyMaxRotation; r++) {
+                    var studyCase = drawCharacter(canvas, $scope.characters[c], r);
+                    studyCase.index = c;
+                    $scope.studyCases.push(studyCase);
+                }
+            } else {
+                var studyCase = drawCharacter(canvas, $scope.characters[c], 0);
+                studyCase.index = c;
+                $scope.studyCases.push(studyCase);
+            }
+        }
+        angular.element(canvas).remove();
+
+        // study
+        $scope.studyTime = Date.now() - $scope.studyStartTime;
+        $scope.studyStartTime = Date.now();
+
+        function studyCycle() {
+            // one cycle
+            for (var c = 0; c < $scope.studyCases.length; c++) {
+                var input = imageToInput($scope.studyCases[c].data);
+                $scope.network.study(input, $scope.studyCases[c].index);
             }
 
             $scope.studyCycle++;
             $scope.studyTime = Date.now() - $scope.studyStartTime;
 
-            angular.element(canvas).remove();
-
             $scope.test();
 
-            $scope.accuracy = $scope.result.success / $scope.result.tests.length;
             if ($scope.accuracy < $scope.acceptedAccuracy) $scope.studyTimeout = $timeout(studyCycle);
             else $scope.studyTimeout = void 0;
         }
@@ -81,46 +128,49 @@ App.controller('controller', ['$scope', '$timeout', function ($scope, $timeout) 
     }
 
     $scope.test = function () {
-        var canvas = angular.element('<canvas width="' + $scope.pictureSide + '" height="' + $scope.pictureSide + '" style="visibility: hidden;"></canvas>')[0];
-        angular.element(document.body).append(canvas);
+        var success = 0;
 
-        $scope.result = {success: 0, tests: []};
-        for (var c = 0; c < $scope.characters.length; c++) {
-            var test = $scope.characters[c];
+        for (var testCaseIndex = 0; testCaseIndex < $scope.testResults.length; testCaseIndex++) {
+            var test = $scope.testResults[testCaseIndex];
 
-            $scope.testCharacter = test;
-            var image = drawCharacter(canvas, test);
-            var input = imageToInput(image);
+            var input = imageToInput(test.data);
             var output = $scope.network.decide(input);
-
             var recognized = outputToCharacter(output);
 
-            if (test == recognized) $scope.result.success++;
-            $scope.result.tests.push({
-                test: test,
-                recognized: recognized
-            });
+            test.recognized = recognized;
+
+            if (test.character == recognized) {
+                test.success = true;
+                success++;
+            } else {
+                test.success = false;
+            }
+            test.count++;
         }
 
-        angular.element(canvas).remove();
+        $scope.accuracy = success / $scope.testResults.length;
     };
 
-    function drawCharacter(canvas, character) {
+    function drawCharacterToData(canvas, character) {
+        return drawCharacter(canvas, character).data;
+    }
+
+    function drawCharacter(canvas, character, rotation) {
         canvas.width = canvas.width;
 
         var ctx = canvas.getContext('2d');
         ctx.save();
-        //ctx.rotate((Math.PI / 180) * (5 - 10 * Math.random()));
+        ctx.rotate((Math.PI / 180) * rotation);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.font = 'bold ' + $scope.pictureSide + 'px sans-serif';
         ctx.fillText(character, canvas.width / 2, canvas.height / 2);
 
-        var image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        var imageUrl = canvas.toDataURL();
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         ctx.restore();
 
-        return image;
-
+        return {url: imageUrl, data: imageData};
     }
 
     $scope.init();
