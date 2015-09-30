@@ -23,22 +23,32 @@
  */
 
 function CharacterOcr(fontSize) {
-    var ch = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+    var ch = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'ST'];
     this.characters = [];
     for (var c = 0; c < ch.length; c++) {
         this.characters.push(ch[c]);
         this.characters.push(ch[c].toLowerCase());
     }
+    for (var c = 0; c < ch.length; c++) {
+        if (ch[c].length > 1) {
+            this.characters.push(ch[c].capitalizeFirstLetter());
+        }
+    }
     for (var c = 0; c < 10; c++) {
         this.characters.push('' + c);
     }
     this.characters.push('.');
-
-    this.characters = sortCharactersByWeight(this.characters, fontSize);
+    this.characters.push('\'');
+    this.characters.push('!');
+    this.characters.push('"');
+    this.characters.push('[');
+    this.characters.push(']');
+    this.characters.push('(');
+    this.characters.push(')');
 
     this.network = new OneLayerSelfOrganizingKohonenNetwork(fontSize * fontSize, this.characters.length);
     this.fontSize = fontSize;
-    this.accuracy = 0.5;
+    //this.accuracy = 0.5;
 
     this.studyMaxRotation = 0;
 }
@@ -142,15 +152,6 @@ function flatImageToImage(image) {
 
     return result;
 }
-function imageWeight(image) {
-    var weight = 0;
-    for (var y = 0; y < image.height; y++) {
-        for (var x = 0; x < image.width; x++) {
-            weight += image.data[(y * image.width * 4) + (x * 4) + 3];
-        }
-    }
-    return weight;
-}
 
 CharacterOcr.prototype.recognize = function (image, characterCoords) {
     var realImage = flatImageToImage(image);
@@ -190,29 +191,7 @@ function imageToInput(image) {
     return input;
 }
 
-function sortCharactersByWeight(characters, fontSize) {
-    var canvas = document.createElement('canvas');
-    canvas.width = fontSize;
-    canvas.height = fontSize;
-
-    var charactersWithWeight = [];
-    for (var c = 0; c < characters.length; c++) {
-        var characterImage = drawCharacter(canvas, characters[c], 0, fontSize);
-        charactersWithWeight.push({character: characters[c], weight: imageWeight(characterImage.data)});
-    }
-
-    charactersWithWeight.sort(function (f, s) {
-        return f.weight - s.weight;
-    });
-
-    var sortedCharacters = [];
-    angular.forEach(charactersWithWeight, function (c) {
-        sortedCharacters.push(c.character);
-    });
-    return sortedCharacters;
-}
-
-CharacterOcr.prototype.startStudy = function () {
+CharacterOcr.prototype.study = function () {
     var self = this;
 
     // init test data
@@ -252,15 +231,8 @@ CharacterOcr.prototype.startStudy = function () {
     return studyCases;
 };
 
-CharacterOcr.prototype.stopStudy = function () {
-    if (this.studyTimeout) {
-        window.clearTimeout(this.studyTimeout);
-        this.studyTimeout = void 0;
-    }
-};
-
 function drawCharacter(canvas, character, rotation, fontSize) {
-    canvas.width = canvas.width;
+    canvas.width = canvas.width; // reset canvas
 
     var ctx = canvas.getContext('2d');
     ctx.save();
@@ -275,4 +247,8 @@ function drawCharacter(canvas, character, rotation, fontSize) {
     ctx.restore();
 
     return {url: imageUrl, data: imageData};
+}
+
+String.prototype.capitalizeFirstLetter = function () {
+    return this.charAt(0).toUpperCase() + this.slice(1);
 };

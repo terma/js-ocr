@@ -18,11 +18,15 @@
     </style>
 </head>
 <body>
-<h1>Text</h1>
+<h1>Simple pure JS OCR (in progress)</h1>
 
-<div style="float: left; width: 50%;">
+<div><a href="https://github.com/terma/js-ocr">GitHub</a></div>
+
+<div style="float: left; width: 45%; padding-right: 3%;">
     <h3>Test Text</h3>
+    <textarea style="width: 99%; height: 100px;" ng-model="testText" ng-model-options="{ debounce: 1000 }"></textarea>
 
+    <h3>Image to test</h3>
     <div style="position: relative;">
         <canvas style="position: absolute; left: 0; top: 0;" id="original" width="500" height="500"></canvas>
         <canvas style="position: absolute; left: 0; top: 0;" id="result" width="500" height="500"></canvas>

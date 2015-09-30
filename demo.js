@@ -24,44 +24,26 @@
 
 var App = angular.module('App', []);
 
-App.controller('controller', ['$scope', '$timeout', function ($scope, $timeout) {
+App.controller('controller', ['$scope', function ($scope) {
 
     $scope.fontSize = 24;
 
-    $scope.text = [
-        'Just take a car.',
-        'Total 10.00',
-        'Mama'
-    ];
+    $scope.testText = 'Just take a car.\n' +
+        'Total 10.00\n' +
+        'Mama\n' +
+        'Don\'t cry!';
 
-
-    function imageToInput(image) {
-        var input = [];
-        for (var y = 0; y < image.height; y++) {
-            for (var x = 0; x < image.width; x++) {
-                var redPixel = image.data[(y * image.width * 4) + (x * 4) + 0];
-                var greenPixel = image.data[(y * image.width * 4) + (x * 4) + 1];
-                var bluePixel = image.data[(y * image.width * 4) + (x * 4) + 2];
-                var alphaPixel = image.data[(y * image.width * 4) + (x * 4) + 3];
-                //if (redPixel > 0 || greenPixel > 0 || bluePixel > 0 || alphaPixel > 0)
-                //    console.log('R:' + redPixel + 'G:' + greenPixel + 'B:' + bluePixel + 'A:' + alphaPixel);
-                input.push(alphaPixel);
-            }
-        }
-        return input;
-    }
-
-    $scope.init = function () {
+    $scope.$watch('testText', function () {
         var canvas = document.getElementById('original');
         canvas.width = canvas.width;
         var ctx = canvas.getContext('2d');
 
-        angular.forEach($scope.text, function (line, lineIndex) {
+        angular.forEach($scope.testText.split('\n'), function (line, lineIndex) {
             drawText(ctx, line, lineIndex);
         });
 
         $scope.recognized();
-    };
+    });
 
     function horizontalLineSumColor(image, x, y0, y1) {
         var sum = 0;
@@ -159,8 +141,9 @@ App.controller('controller', ['$scope', '$timeout', function ($scope, $timeout) 
 
         try {
             var characterOcr = new CharacterOcr($scope.fontSize);
-            var studyCases = characterOcr.startStudy();
+            var studyCases = characterOcr.study();
 
+            document.getElementById('studyImages').innerHTML = '';
             for (var i = 0; i < studyCases.length; i++) {
                 var img = document.createElement('img');
                 img.src = studyCases[i].url;
@@ -185,6 +168,7 @@ App.controller('controller', ['$scope', '$timeout', function ($scope, $timeout) 
             });
             document.getElementById('networkResult').innerHTML = networkResult;
 
+            document.getElementById('characterImages').innerHTML = '';
             for (var i = 0; i < recognize.characterImages.length; i++) {
                 var img = document.createElement('img');
                 img.src = recognize.characterImages[i];
@@ -214,7 +198,5 @@ App.controller('controller', ['$scope', '$timeout', function ($scope, $timeout) 
         ctx.font = 'bold ' + $scope.fontSize + 'px sans-serif';
         ctx.fillText(text, 5, (lineIndex + 1) * 30);
     }
-
-    $scope.init();
 
 }]);

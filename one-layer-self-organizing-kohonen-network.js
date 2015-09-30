@@ -43,7 +43,6 @@ OneLayerSelfOrganizingKohonenNetwork.prototype.study = function (input, outputIn
     var neuron = this.neurons[outputIndex];
     for (var i = 0; i < neuron.inputWeights.length; i++) {
         var originalWeight = neuron.inputWeights[i];
-        //neuron.inputWeights[i] = originalWeight + 0.5 * (input[i] - originalWeight); -> oW + 0.5 * i - 0.5 * oW -> oW * (1 - 0.5) + 0.5 * i
         neuron.inputWeights[i] = originalWeight * (1 - this.studySpeed) + (input[i] * this.studySpeed);
     }
 };

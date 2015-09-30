@@ -1,6 +1,10 @@
+body, textarea {
+    font-family: monospace;
+    font-size: 13px;
+}
+
 body {
     margin: 3%;
-    font-family: monospace;
 }
 
 .result {
