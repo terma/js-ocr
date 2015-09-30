@@ -27,6 +27,7 @@
     <textarea style="width: 99%; height: 100px;" ng-model="testText" ng-model-options="{ debounce: 1000 }"></textarea>
 
     <h3>Image to test</h3>
+
     <div style="position: relative;">
         <canvas style="position: absolute; left: 0; top: 0;" id="original" width="500" height="500"></canvas>
         <canvas style="position: absolute; left: 0; top: 0;" id="result" width="500" height="500"></canvas>
@@ -34,17 +35,17 @@
 </div>
 
 <div style="width: 50%; float: left;">
-    <h3>Study Images</h3>
+    <h3>Recognized text</h3>
 
-    <div id="studyImages"></div>
+    <div id="recognized"></div>
 
     <h3>Before reco images</h3>
 
     <div id="characterImages"></div>
 
-    <h3>Recognized text</h3>
+    <h3>Study Images</h3>
 
-    <div id="recognized"></div>
+    <div id="studyImages"></div>
 
     <h3>Network Result</h3>
 
