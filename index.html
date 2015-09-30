@@ -1,13 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="App" ng-controller="controller">
 <head>
+    <script src="angular.js"></script>
+    <script src="one-layer-self-organizing-kohonen-network.js"></script>
+    <script src="js-ocr.js"></script>
+    <script src="demo.js"></script>
+
     <link rel="stylesheet" href="style.css">
+
+    <style type="text/css">
+
+        #characterImages img, #studyImages img {
+            border: 1px solid blue;
+            margin-right: 2px;
+        }
+
+    </style>
 </head>
 <body>
-<h1>Pure JavaScript OCR Engine (In Progress)</h1>
+<h1>Text</h1>
 
-<a href="character.html">Self-organizing character OCR based on One Level Kohonen Network</a>
-<a href="text.html">Text</a>
+<div style="float: left; width: 50%;">
+    <h3>Test Text</h3>
+
+    <div style="position: relative;">
+        <canvas style="position: absolute; left: 0; top: 0;" id="original" width="500" height="500"></canvas>
+        <canvas style="position: absolute; left: 0; top: 0;" id="result" width="500" height="500"></canvas>
+    </div>
+</div>
+
+<div style="width: 50%; float: left;">
+    <h3>Study Images</h3>
+
+    <div id="studyImages"></div>
+
+    <h3>Before reco images</h3>
+
+    <div id="characterImages"></div>
+
+    <h3>Recognized text</h3>
+
+    <div id="recognized"></div>
+
+    <h3>Network Result</h3>
+
+    <div id="networkResult"></div>
+</div>
+
 </body>
 </html>
 
