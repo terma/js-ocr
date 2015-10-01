@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html ng-app="App" ng-controller="controller">
+<head>
+    <script src="angular.js"></script>
+    <script src="one-layer-self-organizing-kohonen-network.js"></script>
+    <script src="js-ocr.js"></script>
+    <script src="benchmark.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style type="text/css">
+
+        #characterImages img, #studyImages img {
+            border: 1px solid blue;
+            margin-right: 2px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Tests</h1>
+
+<div>
+    <a href="https://github.com/terma/js-ocr">GitHub</a>
+    <a href="index.html">Demo</a>
+</div>
+
+<div style="overflow: visible;" ng-repeat="testCase in testCases">
+    <h3 ng-click="testCase.showDetails = !testCase.showDetails">Case: Tahoma {{ testCase.fontSize }}px, rotation 0, color black &#8212;
+        accuracy {{ testCase.accuracy | number : 0 }}% in {{ testCase.time }} msec</h3>
+
+    <div ng-if="testCase.showDetails" style="width: 48%; height: 200px; overflow: auto; float: left;">
+        <img ng-attr-src="{{ testCase.img }}"/>
+    </div>
+    <pre ng-if="testCase.showDetails" style="margin-left: 2%; width: 48%; height: 200px; overflow: auto; float: left;">{{ testCase.text }}</pre>
+</div>
+
+</body>
+</html>
+

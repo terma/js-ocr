@@ -20,7 +20,10 @@
 <body>
 <h1>Simple pure JS OCR (in progress)</h1>
 
-<div><a href="https://github.com/terma/js-ocr">GitHub</a></div>
+<div>
+    <a href="https://github.com/terma/js-ocr">GitHub</a>
+    <a href="benchmark.html">Tests</a>
+</div>
 
 <div style="float: left; width: 45%; padding-right: 3%;">
     <h3>Test Text</h3>
@@ -52,11 +55,13 @@
     <h3>Study Images</h3>
 
     <a ng-show="!showStudyImages" href="javascript:void(0);" ng-click="showStudyImages = true">Show</a>
+
     <div ng-show="showStudyImages" id="studyImages"></div>
 
     <h3>Network Result</h3>
 
     <a ng-show="!showNetworkResult" href="javascript:void(0);" ng-click="showNetworkResult = true">Show</a>
+
     <div ng-show="showNetworkResult" id="networkResult"></div>
 </div>
 

@@ -167,13 +167,12 @@
     }
 
     CharacterOcr.prototype.recognize = function (image, characterCoords) {
-        var realImage = flatImageToImage(image);
         var characterImages = [];
 
         var self = this;
         var result = [];
-        angular.forEach(characterCoords, function (characterCoord) {
-            var p = subImage(realImage, characterCoord);
+        characterCoords.forEach(function (characterCoord) {
+            var p = subImage(image, characterCoord);
             var characterImage = resizeImage(p, self.fontSize, self.fontSize);
             characterImages.push(imageToUrl(characterImage));
             var input = imageToInputByCoord(characterImage);
@@ -183,8 +182,8 @@
             result.push({character: self.characters[index], neuronOutputs: decision.neuronOutputs});
         });
 
-        console.log('recognized');
-        console.log(result);
+        //console.log('recognized');
+        //console.log(result);
         return {result: result, characterImages: characterImages};
     };
 
@@ -239,8 +238,8 @@
             studyCycle();
         }
 
-        console.log('study finished');
-        console.log(this.network);
+        //console.log('study finished');
+        //console.log(this.network);
         return studyCases;
     };
 
@@ -352,13 +351,15 @@
         return linesCoordinates;
     }
 
-    window.recognize = function (image, fontSize) {
+    window.recognize = function (flatImage, fontSize) {
         var characterOcr = new CharacterOcr(fontSize);
         var studyCases = characterOcr.study();
 
-        var lines = recongnizeLines(image);
+        var image = flatImageToImage(flatImage);
+
+        var lines = recongnizeLines(flatImage);
         lines.forEach(function (line) {
-            line.characterCoords = recongnizeCharacters(image, line);
+            line.characterCoords = recongnizeCharacters(flatImage, line);
             line.recoResult = characterOcr.recognize(image, line.characterCoords);
         });
 
