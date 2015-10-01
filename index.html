@@ -24,6 +24,12 @@
 
 <div style="float: left; width: 45%; padding-right: 3%;">
     <h3>Test Text</h3>
+
+    <p>
+        Font Size {{ fontSize }}px
+        <input type="range" min="10" max="100" step="1" ng-model="fontSize" ng-model-options="{ debounce: 1000 }"/>
+    </p>
+
     <textarea style="width: 99%; height: 100px;" ng-model="testText" ng-model-options="{ debounce: 1000 }"></textarea>
 
     <h3>Image to test</h3>
@@ -45,7 +51,8 @@
 
     <h3>Study Images</h3>
 
-    <div id="studyImages"></div>
+    <a ng-show="!showStudyImages" href="javascript:void(0);" ng-click="showStudyImages = true">Show</a>
+    <div ng-show="showStudyImages" id="studyImages"></div>
 
     <h3>Network Result</h3>
 

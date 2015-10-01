@@ -25,7 +25,16 @@
 (function () {
     function CharacterOcr(fontSize) {
         var ch = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-            'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'ST', 'TE', 'TO', 'OT', 'QT', 'TA'];
+            'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+        var combination = [];
+        ch.forEach(function (c) {
+            combination.push('T' + c);
+            combination.push(c + 'T');
+        });
+
+        ch = ch.concat(combination);
+
         this.characters = [];
         for (var c = 0; c < ch.length; c++) {
             this.characters.push(ch[c]);

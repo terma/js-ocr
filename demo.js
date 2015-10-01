@@ -36,7 +36,19 @@ App.controller('controller', ['$scope', function ($scope) {
         '----------------------------\n' +
         '                Total: 28.25';
 
-    $scope.$watch('testText', function () {
+    $scope.$watch('fontSize', function (oldValue) {
+        if (oldValue != void 0) {
+            $scope.init();
+            $scope.recognized();
+        }
+    });
+
+    $scope.$watch('testText', function (oldValue) {
+        $scope.init();
+        $scope.recognized();
+    });
+
+    $scope.init = function () {
         var canvas = document.getElementById('original');
         canvas.width = canvas.width; // reset canvas
         var ctx = canvas.getContext('2d');
@@ -44,9 +56,7 @@ App.controller('controller', ['$scope', function ($scope) {
         angular.forEach($scope.testText.split('\n'), function (line, lineIndex) {
             drawText(ctx, line, lineIndex);
         });
-
-        $scope.recognized();
-    });
+    };
 
     $scope.recognized = function () {
         var originalCanvas = document.getElementById('original');
@@ -111,7 +121,7 @@ App.controller('controller', ['$scope', function ($scope) {
 
     function drawText(ctx, text, lineIndex) {
         ctx.font = 'bold ' + $scope.fontSize + 'px sans-serif';
-        ctx.fillText(text, 5, (lineIndex + 1) * 30);
+        ctx.fillText(text, 5, (lineIndex + 1) * $scope.fontSize);
     }
 
 }]);
