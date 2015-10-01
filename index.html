@@ -35,9 +35,9 @@
 </div>
 
 <div style="width: 50%; float: left;">
-    <h3>Recognized text</h3>
+    <h3>Recognized text (acc {{ accuracy | number : 0 }}% except spaces)</h3>
 
-    <div id="recognized"></div>
+    <pre id="recognized"></pre>
 
     <h3>Before reco images</h3>
 
@@ -49,7 +49,8 @@
 
     <h3>Network Result</h3>
 
-    <div id="networkResult"></div>
+    <a ng-show="!showNetworkResult" href="javascript:void(0);" ng-click="showNetworkResult = true">Show</a>
+    <div ng-show="showNetworkResult" id="networkResult"></div>
 </div>
 
 </body>

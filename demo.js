@@ -53,33 +53,43 @@ App.controller('controller', ['$scope', function ($scope) {
         var originalCtx = originalCanvas.getContext('2d');
         var originalImage = originalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
 
-        var result = recognize(originalImage, $scope.fontSize);
+        var ocrResult = recognize(originalImage, $scope.fontSize);
 
         document.getElementById('studyImages').innerHTML = '';
-        result.studyCases.forEach(function (studyCase) {
+        ocrResult.studyCases.forEach(function (studyCase) {
             var img = document.createElement('img');
             img.src = studyCase.url;
             document.getElementById('studyImages').appendChild(img);
         });
 
-        document.getElementById('recognized').innerText = '';
-        var networkResult = '';
-        angular.forEach(result.result.result, function (item) {
-            document.getElementById('recognized').innerText += item.character;
+        document.getElementById('recognized').innerText = ocrResult.text;
+        var recoCharacters = ocrResult.text.replace(/\n/g, '');
+        var testCharacters = $scope.testText.replace(/ /g, '').replace(/\n/g, '');
+        var mis = 0;
+        for (var c = 0; c < testCharacters.length && c < recoCharacters.length; c++) {
+            if (testCharacters[c] !== recoCharacters[c]) mis++;
+        }
+        $scope.accuracy = (100 / testCharacters.length) * (testCharacters.length - mis);
 
-            networkResult += item.character + ' ';
-            angular.forEach(item.neuronOutputs, function (o, index) {
-                networkResult += result.characterOcr.characters[index] + '=' + Math.round(o) + ' ';
+        var networkResult = '';
+        angular.forEach(ocrResult.result, function (lineResult) {
+            lineResult.recoResult.result.forEach(function (characterResult) {
+                networkResult += characterResult.character + ' ';
+                angular.forEach(characterResult.neuronOutputs, function (o, index) {
+                    networkResult += ocrResult.characterOcr.characters[index] + '=' + Math.round(o) + ' ';
+                });
             });
             networkResult += '<p>'
         });
         document.getElementById('networkResult').innerHTML = networkResult;
 
         document.getElementById('characterImages').innerHTML = '';
-        result.result.characterImages.forEach(function (characterImage) {
-            var img = document.createElement('img');
-            img.src = characterImage;
-            document.getElementById('characterImages').appendChild(img);
+        ocrResult.result.forEach(function (lineResult) {
+            lineResult.recoResult.characterImages.forEach(function (characterImage) {
+                var img = document.createElement('img');
+                img.src = characterImage;
+                document.getElementById('characterImages').appendChild(img);
+            });
         });
 
         // ---
@@ -88,13 +98,14 @@ App.controller('controller', ['$scope', function ($scope) {
         resultCanvas.width = resultCanvas.width;
         var resultCtx = resultCanvas.getContext('2d');
 
-        angular.forEach(result.characterCoords, function (textCoord) {
-            //ctx.font = 'bold 14px sans-serif';
-            resultCtx.strokeStyle = "#00FF00";
+        ocrResult.result.forEach(function (lineResult) {
+            lineResult.characterCoords.forEach(function (characterCoord) {
+                resultCtx.strokeStyle = "#00FF00";
 
-            resultCtx.beginPath();
-            resultCtx.rect(textCoord.x0 + 0.5, textCoord.y0 + 0.5, textCoord.x1 - textCoord.x0, textCoord.y1 - textCoord.y0);
-            resultCtx.stroke();
+                resultCtx.beginPath();
+                resultCtx.rect(characterCoord.x0 + 0.5, characterCoord.y0 + 0.5, characterCoord.x1 - characterCoord.x0, characterCoord.y1 - characterCoord.y0);
+                resultCtx.stroke();
+            });
         });
     };
 
